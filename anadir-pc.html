@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>computadoras</title>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+      crossorigin="anonymous"
+    />
+  </head>
+  <body>
+    <div class="container mt-5">
+      <div class="card">
+        <div class="card-header">
+          <h2>Añadir pc</h2>
+        </div>
+        <div class="card-body">
+          <form id="car-form">
+            <div class="mb-3">
+              <label for="car-name" class="form-label">Nombre del pc</label>
+              <input type="text" class="form-control" id="car-name" required />
+            </div>
+            <div class="mb-3">
+              <label for="car-brand" class="form-label">Marca</label>
+              <select class="form-select" id="car-brand" required></select>
+            </div>
+            <div class="text-end">
+              <button type="button" class="btn btn-light" onclick="irAtras()">
+                ir al inicio
+              </button>
+              <button type="submit" class="btn btn-success">enviar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="container mt-5">
+      <table id="car-table" class="table table-dark table-bordered">
+        <thead class="thead-light">
+          <tr>
+            <th>pc</th>
+            <th>marca</th>
+            <th>editar</th>
+            <th>borrar</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <script type="module" src="/js/configuracionFirebase.js"></script>
+    <script type="module" src="/js/enviarForm.js"></script>
+
+    <script type="module">
+      import { populateBrands } from "/js/poblarSelect.js";
+      populateBrands();
+
+      import {
+        db,
+        getDocs,
+        collection,
+        deleteDoc,
+        doc,
+        updateDoc,
+      } from "/js/configuracionFirebase.js";
+
+      async function populateCars() {
+        const carsSnapshot = await getDocs(collection(db, "pc"));
+        const carTableBody = document.querySelector("#car-table tbody");
+
+        carsSnapshot.forEach((doc) => {
+          const row = carTableBody.insertRow();
+
+          const carCell = row.insertCell();
+          carCell.textContent = doc.data().name;
+          console.log(doc.data().name);
+          const brandCell = row.insertCell();
+          brandCell.textContent = doc.data().brand;
+
+          const editCell = row.insertCell();
+          editCell.innerHTML =
+            "<button class='btn btn-warning' onclick=\"editCar('" +
+            doc.id +
+            "')\">Edit</button>";
+
+          const deleteCell = row.insertCell();
+          deleteCell.innerHTML =
+            "<button class='btn btn-danger' onclick=\"deleteCar('" +
+            doc.id +
+            "')\">Delete</button>";
+        });
+      }
+
+      populateCars();
+
+      async function deleteCar(id) {
+        await deleteDoc(doc(db, "pc", id));
+      }
+
+      // Hacer la función deleteCar globalmente accesible
+      window.deleteCar = deleteCar;
+
+      async function editCar(id) {
+        const newCarName = prompt("Please enter the new car name:");
+        if (newCarName) {
+          console.log(`Updating car with id ${id} to name ${newCarName}`);
+          try {
+            const carRef = doc(db, "pc", id);
+
+            await updateDoc(carRef, { name: newCarName });
+            console.log("Update successful");
+            alert("Car updated successfully!");
+          } catch (error) {
+            console.error("Error updating document: ", error);
+          }
+        } else {
+          console.log("No new car name entered");
+          alert("No changes made.");
+        }
+      }
+
+      // Hacer la función editCar globalmente accesible
+      window.editCar = editCar;
+
+      function irAtras () {
+        location.href = "/";
+      }
+
+      window.irAtras = irAtras;
+    </script>
+  </body>
+</html>
