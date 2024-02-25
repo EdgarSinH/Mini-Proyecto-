@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>computadoras</title>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+      crossorigin="anonymous"
+    />
+  </head>
+  <body>
+    <div class="container mt-5">
+      <div class="card">
+        <div class="card-header">
+          <h2>Añadir Reserva</h2>
+        </div>
+        <div class="card-body">
+          <form id="reservation-form">
+            <div class="mb-3">
+              <label for="reservation-car" class="form-label">pc</label>
+              <select
+                class="form-select"
+                id="reservation-car"
+                required
+              ></select>
+            </div>
+            <div class="mb-3">
+              <label for="reservation-user" class="form-label">Usuario</label>
+              <select
+                class="form-select"
+                id="reservation-user"
+                required
+              ></select>
+            </div>
+            <div class="text-end">
+              <button type="button" class="btn btn-light" onclick="irAtras()">
+                Ir al inicio
+              </button>
+              <button type="submit" class="btn btn-success">Enviar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="container mt-5">
+      <table id="reservation-table" class="table table-dark table-bordered">
+        <thead class="thead-light">
+          <tr>
+            <th>pc</th>
+            <th>Usuario</th>
+            <th>Editar</th>
+            <th>Borrar</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Las filas se llenarán aquí -->
+        </tbody>
+      </table>
+    </div>
+
+    <script>
+      function irAtras() {
+        location.href = "/";
+      }
+    </script>
+    <script type="module" src="/js/configuracionFirebase.js"></script>
+    <script type="module" src="/js/poblarSelect.js";></script>
+    <script type="module" src="/js/enviarForm.js"></script>
+    <script type="module" src="/js/main.js"></script>
+
+    <script type="module">
+      import {
+        db,
+        getDocs,
+        collection,
+        deleteDoc,
+        doc,
+        updateDoc,
+      } from "/js/configuracionFirebase.js";
+
+
+
+      async function llenarReservaciones() {
+  
+        const snapshotReservaciones = await getDocs(
+          collection(db, "reservado")
+        );
+        const cuerpoTablaReservaciones = document.querySelector(
+          "#reservation-table tbody"
+        );
+        snapshotReservaciones.forEach((doc) => {
+          const fila = cuerpoTablaReservaciones.insertRow();
+          console.log(doc.data());
+          const celdaCoche = fila.insertCell();
+          celdaCoche.textContent = doc.data().car;
+
+          const celdaUsuario = fila.insertCell();
+          celdaUsuario.textContent = doc.data().user;
+
+          const celdaEditar = fila.insertCell();
+          celdaEditar.innerHTML =
+            "<button class='btn btn-warning' onclick=\"editarReservacion('" +
+            doc.id +
+            "')\">Editar</button>";
+
+          const celdaBorrar = fila.insertCell();
+          celdaBorrar.innerHTML =
+            "<button class='btn btn-danger' onclick=\"borrarReservacion('" +
+            doc.id +
+            "')\">Borrar</button>";
+        });
+      }
+
+      llenarReservaciones();
+    </script>
+  </body>
+</html>

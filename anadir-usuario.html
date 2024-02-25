@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>computadoras</title>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+      crossorigin="anonymous"
+    />
+  </head>
+  <body>
+    <div class="container mt-5">
+      <div class="card">
+        <div class="card-header">
+          <h2>Añadir usuario</h2>
+        </div>
+        <div class="card-body">
+          <form id="user-form">
+            <div class="mb-3">
+              <label for="user-name" class="form-label">Nombre</label>
+              <input type="text" class="form-control" id="user-name" required />
+            </div>
+            <div class="mb-3">
+              <label for="user-surname" class="form-label">Apellido</label>
+              <input
+                type="text"
+                class="form-control"
+                id="user-surname"
+                required
+              />
+            </div>
+            <div class="mb-3">
+              <label for="user-id" class="form-label">ID</label>
+              <input type="text" class="form-control" id="user-id" required />
+            </div>
+            <div class="text-end">
+              <button type="button" class="btn btn-light" onclick="irAtras()">
+                ir al inicio
+              </button>
+              <button type="submit" class="btn btn-success">enviar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="container mt-5">
+      <table id="user-table" class="table table-dark table-bordered">
+        <thead class="thead-light">
+          <tr>
+            <th>Nombre</th>
+            <th>Apellido</th>
+            <th>ID</th>
+            <th>Editar</th>
+            <th>Borrar</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Las filas se llenarán aquí -->
+        </tbody>
+      </table>
+    </div>
+
+    <script type="module" src="/js/configuracionFirebase.js"></script>
+    <script type="module" src="/js/enviarForm.js"></script>
+
+    <script type="module">
+      import {
+        db,
+        getDocs,
+        collection,
+        deleteDoc,
+        doc,
+        setDoc,
+        updateDoc,
+      } from "/js/configuracionFirebase.js";
+
+      async function llenarUsuarios() {
+        const snapshotUsuarios = await getDocs(collection(db, "usuarios"));
+        const cuerpoTablaUsuarios = document.querySelector("#user-table tbody");
+
+        snapshotUsuarios.forEach((doc) => {
+          const fila = cuerpoTablaUsuarios.insertRow();
+
+          const celdaNombre = fila.insertCell();
+          celdaNombre.textContent = doc.data().name;
+
+          const celdaApellido = fila.insertCell();
+          celdaApellido.textContent = doc.data().surname;
+
+          const celdaID = fila.insertCell();
+          celdaID.textContent = doc.data().userId;
+
+          const celdaEditar = fila.insertCell();
+          celdaEditar.innerHTML =
+            "<button class='btn btn-warning' onclick=\"editarUsuario('" +
+            doc.id +
+            "')\">Editar</button>";
+
+          const celdaBorrar = fila.insertCell();
+          celdaBorrar.innerHTML =
+            "<button class='btn btn-danger' onclick=\"borrarUsuario('" +
+            doc.id +
+            "')\">Borrar</button>";
+        });
+      }
+
+      llenarUsuarios();
+
+      async function borrarUsuario(id) {
+        await deleteDoc(doc(db, "usuarios", id));
+      }
+
+      // Hacer la función borrarUsuario globalmente accesible
+      window.borrarUsuario = borrarUsuario;
+
+      async function editarUsuario(id) {
+        const nuevoNombre = prompt("Por favor, introduce el nuevo nombre:");
+        const nuevoApellido = prompt("Por favor, introduce el nuevo apellido:");
+        const nuevoID = prompt("Por favor, introduce el nuevo ID:");
+        if (nuevoNombre && nuevoApellido && nuevoID) {
+          console.log(`Actualizando usuario con id ${id}`);
+          try {
+            const refUsuario = doc(db, "usuarios", id);
+
+            await updateDoc(refUsuario, {
+              name: nuevoNombre,
+              surname: nuevoApellido,
+              id: nuevoID,
+            });
+            console.log("Actualización exitosa");
+            alert("¡Usuario actualizado exitosamente!");
+          } catch (error) {
+            console.error("Error actualizando documento: ", error);
+          }
+        } else {
+          console.log("No se introdujo nueva información de usuario");
+          alert("No se realizaron cambios.");
+        }
+      }
+
+      // Hacer la función editarUsuario globalmente accesible
+      window.editarUsuario = editarUsuario;
+
+      document
+        .getElementById("user-form")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const userName = document.getElementById("user-name").value;
+          const userSurname = document.getElementById("user-surname").value;
+          const userId = document.getElementById("user-id").value;
+          const docRef = doc(db, "usuarios", userId);
+          await setDoc(docRef, {
+            userId: userId,
+            name: userName,
+            surname: userSurname,
+          });
+          document.getElementById("user-form").reset();
+          populateUsers(); // Repopulate users after a new one is added
+        });
+    </script>
+
+    <script>
+      function irAtras() {
+        location.href = "/";
+      }
+    </script>
+  </body>
+</html>
