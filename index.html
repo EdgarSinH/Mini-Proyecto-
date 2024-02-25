@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>computadoras</title>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+      crossorigin="anonymous"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <div class="d-flex justify-content-end m-4">
+        <div class="btn-group m-1" role="group" aria-label="Navigation Buttons">
+          <a href="anadir-marca.html" class="btn btn-primary m-1">añadir marca</a>
+          <a href="anadir-pc.html" class="btn btn-primary m-1">añadir pc</a>
+          <a href="anadir-reservacion.html" class="btn btn-primary m-1"
+            >añadir reservacion</a
+          >
+          <a href="anadir-usuario.html" class="btn btn-primary m-1">añadir usuario</a>
+        </div>
+      </div>
+      <table id="car-table" class="table table-striped table-bordered">
+        <thead class="table-dark">
+          <tr>
+            <th>Car</th>
+            <th>Brand</th>
+            <th>Reserved</th>
+            <th>Reserved By</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Rows will be populated here -->
+        </tbody>
+      </table>
+    </div>
+
+    <script type="module" src="/js/configuracionFirebase.js"></script>
+    <script type="module" src="/js/poblarSelect.js";></script>
+    <script type="module" src="/js//js/enviarForm.js"></script>
+    <script type="module" src="/js/main.js"></script>
+  </body>
+</html>
